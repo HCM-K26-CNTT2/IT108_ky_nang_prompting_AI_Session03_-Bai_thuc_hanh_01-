@@ -1,0 +1,64 @@
+﻿Trích xuất và định dạng thông tin tuyển dụng
+3. Yêu cầu
+Xây dựng một Prompt duy nhất có khả năng xử lý một đoạn email ứng tuyển thô và trả về đồng thời:
+* Một bảng Markdown tóm tắt thông tin ứng viên.
+* Một mảng JSON thô (raw JSON) chứa thông tin ứng viên để nạp vào database.
+4. Quy tắc xử lý
+Sử dụng khung cấu trúc CREATE:
+* C - Context: Đóng vai trò là Chuyên viên xử lý dữ liệu nhân sự cấp cao.
+* R - Request: Trích xuất các trường thông tin: Họ tên, Số điện thoại, Email, Vị trí ứng tuyển, Năm kinh nghiệm, Kỹ năng chính.
+* E - Explanation: Dữ liệu này sẽ dùng để import trực tiếp vào database tuyển dụng nên cần độ chính xác 100%.
+* A - Action: Quét qua email thô, xác định đúng các trường thông tin, phân loại kỹ năng thành một danh sách.
+* T - Tone: Chính xác, khách quan, không thêm thắt văn phong cảm xúc.
+* E - Extras: Cung cấp ít nhất 2 ví dụ Few-shot mẫu (cặp dữ liệu Input email thô -> Output mong muốn) để định hình kết quả của AI.
+5. Yêu cầu xử lý dữ liệu
+Trích xuất và chuẩn hóa các thông tin sau:
+* Họ tên: Chuyển về dạng viết hoa chữ cái đầu (Ví dụ: Nguyễn Văn A).
+* Số điện thoại: Chuẩn hóa về định dạng đầu số quốc gia hoặc loại bỏ dấu cách dư thừa.
+* Kỹ năng chính: Gom nhóm thành một danh sách không trùng lặp (ví dụ: ['Python', 'SQL', 'FastAPI']).
+* Trả về định dạng JSON thuần túy theo cấu trúc:
+  { "name": "...", "phone": "...", "email": "...", "position": "...", "experience_years": 2, "skills": [...] }
+6. Ràng buộc kỹ thuật
+Không được tự ý thêm thắt hoặc ảo giác các thông tin không có trong email của ứng viên.
+Nếu thông tin nào bị thiếu (ví dụ không ghi số điện thoại), phải để giá trị là null trong JSON, không được tự điền bừa.
+Chỉ trả về dữ liệu kết quả, nghiêm cấm AI viết thêm các đoạn văn giải thích ở đầu hoặc cuối câu trả lời.
+Kiểm tra tính đúng đắn của cấu trúc JSON bằng các công cụ Validate JSON.
+
+
+
+
+BAI LAM
+Context: ban dong vai tro la chuyên viên xử lý dữ liệu nhân sự cấp cao va dang loc Email cua cac sinh vien, nhung moi email viet theo phong cach tu do khac nhau va khien mat nhieu thoi gian.
+
+
+Request: ban hay loc cac thong tin chinh tu email cua cac ban sinh vien ( Ho ten, So dien thoai, Email, Vi tri ung tuyen, So nam kinh nghiem, Cac ky nang).
+
+
+Explanation: neu thieu thong tin nao thi phai ghi khong co thong tin, toan bo thong tin phai loc chinh xac 100%, nhung thong tin loc phai tra ve giong nhu dang sau day:
+* Họ tên: chuyển về dạng viết hoa chữ cái đầu (Ví dụ: Nguyễn Văn A).
+* Số điện thoại: ghi du 10 so.
+* So nam kinh nghiem: dua ve so nguyen hoac so thap phan
+* Kỹ năng chính: Gom nhóm thành một danh sách không trùng lặp (ví dụ: ['Python', 'SQL', 'FastAPI']).
+* Trả về định dạng JSON thuần túy theo cấu trúc:
+{ "name": "...", "phone": "...", "email": "...", "position": "...", "experience_years": 2, "skills": [...] }
+* Khong co chao hoi hay giai thich dai dong
+
+
+Action: quet qua email tho -> loc thong tin -> phan loai ro rang
+Tone: chinh xac, chuyen nghiep va khach quan
+Extras: hay loc cac thong tin duoi dang bang markdown va dinh dang JSON
+vd: Phan Hong Nhan muon lam nhan vien ky thuat, co 4 nam kinh nghiem, phanhongnhan123@gmail.com, 0913542434, C++, Python, SQL
+
+
+Bang markdown
+| Ho ten | So dien thoai | Email | Vi tri ung tuyen | So nam kinh nghiem | Cac ky nang |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+|Phan Hong Nhan | 0913542434 | phanhongnhan123@gmail.com | nhan vien ky thuat | 4 | [C++, Python, SQL] |
+Dinh dang JSON
+name": "Phan Hong Nhan" 
+"phone": "0913542434",
+ "email": "phanhongnhan123@gmail.com " 
+"position": "nhan vien ky thuat"
+ "experience_years": 4
+ "skills": [C++, Python, SQL]
+vd: Nguyen Gia Hoang xet vao lam vi tri nhan vien lap trinh vien, kinh nghiem lam viec 5 nam, giahoangnguyen146@gmail.com,  Python, C++, C, 0915893647
